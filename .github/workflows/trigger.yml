@@ -1,0 +1,23 @@
+name: Trigger Jenkins on PR Merge to Main
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  trigger-jenkins:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger Jenkins Job
+      uses: fjogeleit/http-request-action@v1.8.0
+      with:
+        url: ${{ secrets.JENKINS_URL }}/job/ci/build?token=${{ secrets.JENKINS_TOKEN }}
+        method: 'POST'
+        contentType: 'application/json'
+        customHeaders: >-
+          {
+            "Authorization": "Basic ${{ secrets.JENKINS_AUTH }}"
+          }
